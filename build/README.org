@@ -1,0 +1,34 @@
+* Build
+
+** Materials
+
+- Raspberry Pi 2B (?)
+- 15x15 WS2812b LEDs
+- 5V/3.3V buffer
+- Gyro sensor (not neccessary)
+- 5V Power supply
+
+** Steps
+
+*** Drawing the lines
+[[./images/step-0.jpg]]
+
+*** Adding LEDs
+[[./images/step-1.jpg]]
+
+*** Dividers
+[[./images/step-2.jpg]]
+
+*** Raspberry Pi and Power
+[[./images/step-3.jpg]]
+[[./images/step-4.jpg]]
+
+*** Power on!
+LED strip is connected via a 5V<->3.3V buffer to GPIO on the Pi.
+
+[[./images/step-5a.jpg]]
+[[./images/step-5b.jpg]]
+
+*** Acrylic
+[[./images/step-6a.jpg]]
+[[./images/step-6b.jpg]]

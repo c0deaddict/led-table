@@ -1,0 +1,5 @@
+* Server
+
+This is the code that runs on the Pi.
+
+** TODO clean up code and publish here

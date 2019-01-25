@@ -1,0 +1,10 @@
+* LED table
+
+This repository contains code for use on and with the LED table.
+
+[[./build/images/final.jpg]]
+
+** Contents
+- [[./build/README.org][Build]]
+- [[./server/README.org][Server]]
+- [[./client/README.org][Client]]
