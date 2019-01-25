@@ -8,6 +8,8 @@
 - Gyro sensor (not neccessary)
 - 5V Power supply
 
+*** TODO add total cost estimation.
+
 ** Steps
 
 *** Drawing the lines
@@ -17,18 +19,23 @@
 [[./images/step-1.jpg]]
 
 *** Dividers
+Laser cut by [[snijlab.nl]]
+**** TODO add inkscape svg files here.
 [[./images/step-2.jpg]]
 
 *** Raspberry Pi and Power
+**** TODO add diagram here.
 [[./images/step-3.jpg]]
 [[./images/step-4.jpg]]
 
 *** Power on!
-LED strip is connected via a 5V<->3.3V buffer to GPIO on the Pi.
-
+LED strip is connected via a 5V<->3.3V buffer to GPIO on the Pi
+.
 [[./images/step-5a.jpg]]
 [[./images/step-5b.jpg]]
 
 *** Acrylic
+Ordered, cut to the right size, at [[https://www.dokter-plexiglas.nl/][Dokter Plexiglas]]
+
 [[./images/step-6a.jpg]]
 [[./images/step-6b.jpg]]

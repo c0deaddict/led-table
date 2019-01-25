@@ -1,15 +1,15 @@
 * Client
 
 Use this code to send images (or video) to the Pi and show it on the
-LED table. Code is written in Python 3. For the `send_img.py` and
-`send_video.py` you need to have OpenCV installed. If you are using
-[[https://nixos.org/][NixOS]] you can use the `default.nix` by invoking `nix-shell` in the
-`client` directory.
+LED table. Code is written in Python 3. For the =send_img.py= and
+=send_video.py= you need to have OpenCV installed. If you are using
+[[https://nixos.org/][NixOS]] you can use the =default.nix= by invoking =nix-shell= in the
+=client= directory.
 
-The server listens on UDP port 1338 for packets of `3*15*15`
+The server listens on UDP port 1338 for packets of =3*15*15=
 bytes. 3 bytes for each pixel: Red (0-255), Green and Blue. The first
-15 pixels are `(x=0,y=0)` to `(14,0)`, the next 15 bytes are for the
-next row, eg. `(0,1)` to `(14,1)`.
+15 pixels are =(x=0,y=0)= to =(14,0)=, the next 15 bytes are for the
+next row, eg. =(0,1)= to =(14,1)=.
 
 After 10 minutes of inactivity (no UDP packet's received) the LEDs are
 turned off.
