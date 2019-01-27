@@ -2,15 +2,15 @@
 
 ** Materials and costs
 
-| Component           | Qty/measurement |     $$ |
+| Component           | Qty/measurement |   Cost |
 |---------------------+-----------------+--------|
 | Ikea LACK table     |               1 |   5.00 |
 | Raspberry Pi 2B (?) |               1 |  35.00 |
 | WS2812b LEDs        |           15x15 |  30.00 |
 | 5V/3.3V buffer      |               1 |   1.00 |
 | 5V Power supply     |               1 |  20.00 |
-| Acrylic 5mm         |                 |  50.00 |
-| MDF 3mm dividers    |                 |  70.00 |
+| Acrylic 5mm         | 560mm^2 + sides |  50.00 |
+| MDF 3mm dividers    |           14+14 |  70.00 |
 |---------------------+-----------------+--------|
 | Total               |                 | 211.00 |
 #+TBLFM: @>$3=vsum(@I..@II);%.2f
@@ -21,8 +21,7 @@
 Begin by drawing a cross on the table, and recurse until the center of
 each cell is draw.
 
-#+ATTR_HTML: :width 50% :height 50%
-[[./images/step-0.jpg]]
+[[./images/hires/step-0.jpg][./images/thumbs/step-0.jpg]]
 
 *** Adding LEDs
 Cut the LED strip in pieces and paste them with hot glue on each
@@ -30,15 +29,14 @@ center on the table. Connect the LEDs back together with three wires
 per piece (5V, GND and DI/DO). Pay attention to wire each DO
 (Data-Out) to a DI (Data-In) on the neighboring LED.
 
-#+ATTR_HTML: :width 50% :height 50%
-[[./images/step-1.jpg]]
+[[./images/hires/step-1.jpg][./images/thumbs/step-1.jpg]]
 
 *** Dividers
 The dividers where tricky. My first thought was cutting it by hand out
 of cardboard. But I'm not really precise, and doing it 28 times (14
 horizontal and 14 diagonal) would have been difficult.
 
-After some looking around for other options I found [[snijlab.nl]]. Which
+After some looking around for other options I found [[https://www.snijlab.nl][snijlab.nl]] Which
 is a great online service that will laser cut SVG files. It does come
 at a price, but the result is beautiful and very precise. A
 side-effect of the laser cutting are the burnt edges. This actually
@@ -46,8 +44,7 @@ gives a really nice effect as the black enhances the edges.
 
 **** TODO add inkscape svg files here.
 
-#+ATTR_HTML: :width 50% :height 50%
-[[./images/step-2.jpg]]
+[[./images/hires/step-2.jpg][./images/thumbs/step-2.jpg]]
 
 *** Raspberry Pi and Power
 Controlling the LEDs is a Raspberry Pi (model 2B, other models will
@@ -57,25 +54,19 @@ signal. To bridge this gap a 3.3V<->5V buffer is used.
 **** TODO which buffer did I use?
 **** TODO add diagram here.
 
-#+ATTR_HTML: :width 50% :height 50%
-[[./images/step-3.jpg]]
-#+ATTR_HTML: :width 50% :height 50%
-[[./images/step-4.jpg]]
+[[./images/hires/step-3.jpg][./images/thumbs/step-3.jpg]]
+[[./images/hires/step-4.jpg][./images/thumbs/step-4.jpg]]
 
 *** Power on!
 
 It works \o/
 
-#+ATTR_HTML: :width 50% :height 50%
-[[./images/step-5a.jpg]]
-#+ATTR_HTML: :width 50% :height 50%
-[[./images/step-5b.jpg]]
+[[./images/hires/step-5a.jpg][./images/thumbs/step-5a.jpg]]
+[[./images/hires/step-5b.jpg][./images/thumbs/step-5b.jpg]]
 
 *** Acrylic
 Ordered, cut to the right size, at [[https://www.dokter-plexiglas.nl/][Dokter Plexiglas]]. Glued together
 with special Acrylic glue.
 
-#+ATTR_HTML: :width 50% :height 50%
-[[./images/step-6a.jpg]]
-#+ATTR_HTML: :width 50% :height 50%
-[[./images/step-6b.jpg]]
+[[./images/hires/step-6a.jpg][./images/thumbs/step-6a.jpg]]
+[[./images/hires/step-6b.jpg][./images/thumbs/step-6b.jpg]]
