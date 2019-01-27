@@ -1,10 +1,15 @@
 * LED table
 
-This repository contains code for use on and with the LED table.
+This repository is about the LED table I created in the first half
+of 2017. The table is based on an Ikea LACK table with 15x15
+individually addressable full color RGB LED's on it. A Raspberry Pi is
+mounted below that controls the LED array.
 
+#+ATTR_HTML: :width 50% :height 50%
 [[./build/images/final.jpg]]
 
 ** Contents
-- [[./build/README.org][Build]]
-- [[./server/README.org][Server]]
-- [[./client/README.org][Client]]
+
+- [[./build/][Build]]: how the table is made.
+- [[./server/][Server]]: code that runs on the Pi.
+- [[./client/][Client]]: code that sends images to the server.

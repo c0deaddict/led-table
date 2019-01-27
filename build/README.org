@@ -1,41 +1,81 @@
 * Build
 
-** Materials
+** Materials and costs
 
-- Raspberry Pi 2B (?)
-- 15x15 WS2812b LEDs
-- 5V/3.3V buffer
-- Gyro sensor (not neccessary)
-- 5V Power supply
-
-*** TODO add total cost estimation.
+| Component           | Qty/measurement |     $$ |
+|---------------------+-----------------+--------|
+| Ikea LACK table     |               1 |   5.00 |
+| Raspberry Pi 2B (?) |               1 |  35.00 |
+| WS2812b LEDs        |           15x15 |  30.00 |
+| 5V/3.3V buffer      |               1 |   1.00 |
+| 5V Power supply     |               1 |  20.00 |
+| Acrylic 5mm         |                 |  50.00 |
+| MDF 3mm dividers    |                 |  70.00 |
+|---------------------+-----------------+--------|
+| Total               |                 | 211.00 |
+#+TBLFM: @>$3=vsum(@I..@II);%.2f
 
 ** Steps
 
 *** Drawing the lines
+Begin by drawing a cross on the table, and recurse until the center of
+each cell is draw.
+
+#+ATTR_HTML: :width 50% :height 50%
 [[./images/step-0.jpg]]
 
 *** Adding LEDs
+Cut the LED strip in pieces and paste them with hot glue on each
+center on the table. Connect the LEDs back together with three wires
+per piece (5V, GND and DI/DO). Pay attention to wire each DO
+(Data-Out) to a DI (Data-In) on the neighboring LED.
+
+#+ATTR_HTML: :width 50% :height 50%
 [[./images/step-1.jpg]]
 
 *** Dividers
-Laser cut by [[snijlab.nl]]
+The dividers where tricky. My first thought was cutting it by hand out
+of cardboard. But I'm not really precise, and doing it 28 times (14
+horizontal and 14 diagonal) would have been difficult.
+
+After some looking around for other options I found [[snijlab.nl]]. Which
+is a great online service that will laser cut SVG files. It does come
+at a price, but the result is beautiful and very precise. A
+side-effect of the laser cutting are the burnt edges. This actually
+gives a really nice effect as the black enhances the edges.
+
 **** TODO add inkscape svg files here.
+
+#+ATTR_HTML: :width 50% :height 50%
 [[./images/step-2.jpg]]
 
 *** Raspberry Pi and Power
+Controlling the LEDs is a Raspberry Pi (model 2B, other models will
+also do). The Pi's GPIO pins operate at 3.3V, the WS2812b expects a 5V
+signal. To bridge this gap a 3.3V<->5V buffer is used.
+
+**** TODO which buffer did I use?
 **** TODO add diagram here.
+
+#+ATTR_HTML: :width 50% :height 50%
 [[./images/step-3.jpg]]
+#+ATTR_HTML: :width 50% :height 50%
 [[./images/step-4.jpg]]
 
 *** Power on!
-LED strip is connected via a 5V<->3.3V buffer to GPIO on the Pi
-.
+
+It works \o/
+
+#+ATTR_HTML: :width 50% :height 50%
 [[./images/step-5a.jpg]]
+#+ATTR_HTML: :width 50% :height 50%
 [[./images/step-5b.jpg]]
 
 *** Acrylic
-Ordered, cut to the right size, at [[https://www.dokter-plexiglas.nl/][Dokter Plexiglas]]
+Ordered, cut to the right size, at [[https://www.dokter-plexiglas.nl/][Dokter Plexiglas]]. Glued together
+with special Acrylic glue.
 
+#+ATTR_HTML: :width 50% :height 50%
 [[./images/step-6a.jpg]]
+#+ATTR_HTML: :width 50% :height 50%
 [[./images/step-6b.jpg]]
