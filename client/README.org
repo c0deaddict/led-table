@@ -6,10 +6,56 @@ LED table. Code is written in Python 3. For the =send_img.py= and
 [[https://nixos.org/][NixOS]] you can use the =default.nix= by invoking =nix-shell= in the
 =client= directory.
 
-The server listens on UDP port 1338 for packets of =3*15*15=
-bytes. 3 bytes for each pixel: Red (0-255), Green and Blue. The first
-15 pixels are =(x=0,y=0)= to =(14,0)=, the next 15 bytes are for the
-next row, eg. =(0,1)= to =(14,1)=.
+The server listens on UDP port 1337 for [[http://openpixelcontrol.org/][Open Pixel Control]]
+messages. See the link for more information. Channel is ignored,
+and a maximum of =15x15= LEDs can be controlled.
 
-After 10 minutes of inactivity (no UDP packet's received) the LEDs are
+Command =1= can be used to set a number of pixels individually. This
+commands expects data to be a multiple of 5 bytes. Each 5 bytes form a
+=set_pixel_color= command: ([[./rand.py]] uses this)
+- byte 0: x (0-14)
+- byte 1: y (0-14)
+- byte 2: b (blue, 0-255)
+- byte 3: g (green, 0-255)
+- byte 4: r (red, 0-255)
+
+After 5 minutes of inactivity (no UDP packet's received) the LEDs are
 turned off.
+
+** Usage
+
+The sample scripts connect to the hostname =led-table=. You should
+configure this host in your =/etc/hosts= file, or set the IP address
+in [[./base.py]].
+
+*** rand.py
+
+Sets a random pixel to a random color multiple times a second.
+
+   #+begin_src bash
+   python rand.py
+   #+end_src
+
+*** send_img.py
+
+Render an image file and send it to the table.
+
+    #+begin_src bash
+    python send_img.py <image_filename>
+    #+end_src
+
+*** send_video.py
+
+Captures an image from your webcam and sends it to the table.
+
+    #+begin_src bash
+    python send_video.py
+    #+end_src
+
+Instead of the webcam image, you can also uncomment the line in the
+top of the file to play a video to the table:
+
+    #+begin_src python
+    # cap = cv2.VideoCapture(2)
+    cap = cv2.VideoCapture('/home/jos/Videos/test.mp4')
+    #+end_src

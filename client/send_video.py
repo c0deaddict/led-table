@@ -1,12 +1,11 @@
 import numpy as np
 import cv2
-import socket
+
+from base import send_frame
+
 
 cap = cv2.VideoCapture(2)
 # cap = cv2.VideoCapture('/home/jos/Videos/test.mp4')
-
-LED_TABLE = ('led-table', 1338)
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 while(cap.isOpened()):
     # Capture frame-by-frame
@@ -25,12 +24,7 @@ while(cap.isOpened()):
     frame = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
 
     new_frame = cv2.resize(frame, (15, 15))
-
-    data = bytearray()
-    for y in range(15):
-        for x in range(15):
-            data.extend(bytearray(new_frame[x][y].tobytes()))
-    sock.sendto(data, LED_TABLE)
+    send_frame(new_frame)
 
     # Our operations on the frame come here
     #gray = cv2.cvtColor(new_frame, cv2.COLOR_BGR2GRAY)

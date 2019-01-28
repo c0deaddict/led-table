@@ -1,12 +1,11 @@
 import numpy as np
 import cv2
-import socket
 import sys
 
-frame = cv2.imread(sys.argv[1])
+from base import send_frame
 
-LED_TABLE = ('led-table', 1338)
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+frame = cv2.imread(sys.argv[1])
 
 # decrease brightness
 # https://stackoverflow.com/a/47427398
@@ -21,10 +20,4 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 #frame = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
 
 new_frame = cv2.resize(frame, (15, 15))
-
-data = bytearray()
-for y in range(15):
-    for x in range(15):
-        data.extend(bytearray(new_frame[x][y].tobytes()))
-
-sock.sendto(data, LED_TABLE)
+send_frame(new_frame)

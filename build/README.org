@@ -7,12 +7,13 @@
 | Ikea LACK table     |               1 |   5.00 |
 | Raspberry Pi 2B (?) |               1 |  35.00 |
 | WS2812b LEDs        |           15x15 |  30.00 |
-| 5V/3.3V buffer      |               1 |   1.00 |
-| 5V Power supply     |               1 |  20.00 |
+| 5V/3.3V buffer      |               1 |   0.50 |
+| 5V Power supply 18A |               1 |  26.77 |
 | Acrylic 5mm         | 560mm^2 + sides |  50.00 |
 | MDF 3mm dividers    |           14+14 |  70.00 |
+| Various parts       |                 |  30.00 |
 |---------------------+-----------------+--------|
-| Total               |                 | 211.00 |
+| Total               |                 | 247.27 |
 #+TBLFM: @>$3=vsum(@I..@II);%.2f
 
 ** Steps
@@ -49,9 +50,8 @@ gives a really nice effect as the black enhances the edges.
 *** Raspberry Pi and Power
 Controlling the LEDs is a Raspberry Pi (model 2B, other models will
 also do). The Pi's GPIO pins operate at 3.3V, the WS2812b expects a 5V
-signal. To bridge this gap a 3.3V<->5V buffer is used.
+signal. To bridge this gap a =SN74HCT125N= 3.3V<->5V buffer is used.
 
-**** TODO which buffer did I use?
 **** TODO add diagram here.
 
 [[./images/hires/step-3.jpg][./images/thumbs/step-3.jpg]]

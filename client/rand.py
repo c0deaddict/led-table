@@ -3,11 +3,8 @@ import socket
 import time
 from random import randint
 
-LED_TABLE = ('led-table', 1338)
-WIDTH = 15
-HEIGHT = 15
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+from base import WIDTH, HEIGHT, set_pixel_color
 
 
 class Color:
@@ -34,20 +31,9 @@ def rand_color():
     )
 
 
-def send_image(image):
-    data = bytearray()
-    for y in range(HEIGHT):
-        for x in range(WIDTH):
-            data.extend(image[x][y].to_bytes())
-
-    sock.sendto(data, LED_TABLE)
-
-
-image = [[BLACK for x in range(WIDTH)] for y in range(HEIGHT)]
 while True:
     color = rand_color()
     x = randint(0, WIDTH - 1)
     y = randint(0, HEIGHT - 1)
-    image[x][y] = color
-    send_image(image)
-    time.sleep(0.01)
+    set_pixel_color(x, y, color)
+    time.sleep(0.02)
