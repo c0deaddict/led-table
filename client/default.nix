@@ -2,9 +2,16 @@ with import <nixpkgs> {};
 
 let
 
-opencv3WithGtk = python36Packages.opencv3.override {
+python = python37;
+pythonPackages = python37Packages;
+
+opencv3WithGtk = pythonPackages.opencv3.override {
   enableGtk3 = true;
   enableFfmpeg = true;
+};
+
+ModernGL = callPackage ./moderngl.nix {
+  inherit (pythonPackages) buildPythonPackage fetchPypi;
 };
 
 in
@@ -18,11 +25,13 @@ stdenv.mkDerivation rec {
   '';
 
   buildInputs = [
-    python36
-    python36Packages.numpy
+    python
     opencv3WithGtk
-  ];
-
-  shellHook = ''
-  '';
+    ModernGL
+    ] ++ (with pythonPackages; [
+      numpy
+      pillow
+      pyrr
+      pyqt5
+    ]);
 }

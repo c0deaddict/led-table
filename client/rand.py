@@ -4,21 +4,7 @@ import time
 from random import randint
 
 
-from base import WIDTH, HEIGHT, set_pixel_color
-
-
-class Color:
-    def __init__(self, r, g, b):
-        self.r = r
-        self.g = g
-        self.b = b
-
-    def to_bytes(self):
-        return bytearray([self.r, self.g, self.b])
-
-    def __repr__(self):
-        return '(%d, %d, %d)' % (self.r, self.g, self.b)
-
+from base import WIDTH, HEIGHT, set_pixel_color, Color
 
 BLACK = Color(0, 0, 0)
 

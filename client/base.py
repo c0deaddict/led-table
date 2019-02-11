@@ -22,7 +22,32 @@ def send_frame(frame):
     send_cmd(0, 0, data)
 
 
+def send_updates(updates):
+    data = bytearray()
+    for (x, y), color in updates:
+        data.extend([x, y])
+        data.extend(color.tobytes())
+
+    if data:
+        send_cmd(0, 1, data)
+
+
 def set_pixel_color(x, y, color):
-    data = bytearray([x, y])
-    data.extend(color.to_bytes())
-    send_cmd(0, 1, data)
+    send_updates([((x, y), color)])
+
+
+def send_reset():
+    send_frame([[Color(0, 0, 0)] * WIDTH] * HEIGHT)
+
+
+class Color:
+    def __init__(self, r, g, b):
+        self.r = r
+        self.g = g
+        self.b = b
+
+    def tobytes(self):
+        return bytearray([self.r, self.g, self.b])
+
+    def __repr__(self):
+        return '(%d, %d, %d)' % (self.r, self.g, self.b)
