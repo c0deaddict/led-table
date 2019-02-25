@@ -10,10 +10,6 @@ opencv3WithGtk = pythonPackages.opencv3.override {
   enableFfmpeg = true;
 };
 
-ModernGL = callPackage ./moderngl.nix {
-  inherit (pythonPackages) buildPythonPackage fetchPypi;
-};
-
 in
 
 stdenv.mkDerivation rec {
@@ -27,11 +23,11 @@ stdenv.mkDerivation rec {
   buildInputs = [
     python
     opencv3WithGtk
-    ModernGL
     ] ++ (with pythonPackages; [
       numpy
       pillow
       pyrr
       pyqt5
+      moderngl
     ]);
 }

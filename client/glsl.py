@@ -1,4 +1,3 @@
-
 """
 simple raymarching demo with moderngl
 
@@ -188,7 +187,7 @@ void main()
     vec3 r = normalize(vec3(v_uv - vec2(0.5, 0.5), 1.001));
 
     // l: light
-    vec3 l = normalize(vec3(T*10, T*10, -10.1));
+    vec3 l = normalize(vec3(cos(T)*10, sin(T)*10, -10.1));
 
     // c: albedo
     vec3 c = vec3(0.125);
@@ -254,40 +253,48 @@ idx_data = np.array([
 ]).astype(np.int32)
 vbo = ctx.buffer(idx_data.tobytes())
 vao = ctx.vertex_array(prog, content, vbo)
-u_time = prog.get("T", 0.0)
+u_time = prog.get("T", 1.0)
 
 # prog.uniforms['Light'].value = (-140.0, -300.0, 350.0)
 # prog.uniforms['Color'].value = (1.0, 1.0, 1.0, 0.25)
 # prog.uniforms['Mvp'].write(mvp.astype('float32').tobytes())
 
 # Framebuffers
-dim = (15,15)
+dim = (15, 15)
 fbo1 = ctx.framebuffer(ctx.renderbuffer(dim, samples=4))
 fbo2 = ctx.framebuffer(ctx.renderbuffer(dim))
 
 # Rendering
 fbo1.use()
 ctx.enable(mg.DEPTH_TEST)
-ctx.clear(0.9, 0.9, 0.9)
-#texture.use()
-vao.render()
-
-# Downsampling and loading the image using Pillow
-ctx.copy_framebuffer(fbo2, fbo1)
-data = fbo2.read(components=3, alignment=1)
+ctx.clear(0, 0, 0)
 
 from base import *
-frame = [[None for y in range(HEIGHT)] for x in range(WIDTH)]
-for x in range(WIDTH):
-    for y in range(HEIGHT):
-        i = 3 * (y * HEIGHT + x)
-        r, g, b = data[i:i+3]
-        frame[x][y] = Color(r, g, b)
-send_frame(frame)
+t = 0.0
+while True:
+    time_value = struct.pack('f', t)
+    t = t + 0.01
+    u_time.write(time_value)
+    vao.render()
 
-#print(len(data))
-img = Image.frombytes('RGB', fbo2.size, data).transpose(Image.FLIP_TOP_BOTTOM)
-img.show()
+    # Downsampling and loading the image using Pillow
+    ctx.copy_framebuffer(fbo2, fbo1)
+    data = fbo2.read(components=3, alignment=1)
+
+    frame = [[None for y in range(HEIGHT)] for x in range(WIDTH)]
+    for x in range(WIDTH):
+        for y in range(HEIGHT):
+            i = 3 * (y * HEIGHT + x)
+            r, g, b = data[i:i+3]
+            frame[x][y] = Color(r, g, b)
+    send_frame(frame)
+
+    #print(len(data))
+    #img = Image.frombytes('RGB', fbo2.size, data).transpose(Image.FLIP_TOP_BOTTOM)
+    #img.show()
+
+    time.sleep(0.05)
+    print('frame')
 
 #time_value = struct.pack('f', time.clock() * 2.0)
 #self.u_time.write(time_value)
