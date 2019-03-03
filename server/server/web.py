@@ -6,7 +6,7 @@ import os
 
 from aiohttp.web_fileresponse import FileResponse
 
-from . import settings
+from . import settings, leds
 from .log import logger
 from .request_logger import request_logger
 
@@ -18,16 +18,10 @@ async def get_index(request):
     return web.HTTPFound(location='/static/index.html')
 
 
-async def get_photo(request):
-    filepath = os.path.join(settings.PHOTOS_ROOT,
-                            request.match_info['album'],
-                            request.match_info['name'])
-    return FileResponse(filepath)
-
-
 async def trigger_event(request):
     event = request.match_info['event']
     event_queue.put_nowait(event)
+    await leds.paint(123)
     return web.Response(status=200, body='thank you come again')
 
 

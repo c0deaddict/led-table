@@ -12,6 +12,7 @@ let
     extraLibs = with pythonPackages; [
       # dev
       jedi
+      autopep8
       # deps
       aiohttp
     ];

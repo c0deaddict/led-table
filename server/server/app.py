@@ -7,7 +7,7 @@ from .log import logger
 services = [
     opc.udp_server,
     opc.tcp_server,
-    leds,
+    leds.display,
 ]
 
 
