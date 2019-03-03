@@ -6,12 +6,12 @@ from ..settings import WIDTH, HEIGHT
 
 class FakeLeds:
     def start(self):
-        logger.info('Starting Fake LEDs (4 sec)')
-        time.sleep(4)
+        logger.info('Starting Fake LEDs (2 sec)')
+        time.sleep(2)
 
     def stop(self):
-        logger.info('Stopping Fake LEDs (3 sec)')
-        time.sleep(3)
+        logger.info('Stopping Fake LEDs (1 sec)')
+        time.sleep(1)
 
     def paint(self, frame):
         num = 0

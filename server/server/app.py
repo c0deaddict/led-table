@@ -1,6 +1,7 @@
 import asyncio
 
 from . import opc, web, leds
+from .scheduler import scheduler
 from .log import logger
 
 
@@ -8,6 +9,7 @@ services = [
     opc.udp_server,
     opc.tcp_server,
     leds.display,
+    scheduler,
 ]
 
 
