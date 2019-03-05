@@ -29,6 +29,10 @@ class NeoStrip:
         self.reset()
         self.pixels = None
 
+    def reset(self):
+        self.pixels.fill((0, 0, 0))
+        self.pixels.show()
+
     def paint(self, frame):
         for (x,y), color in frame.items():
             if 0 <= x < WIDTH and 0 <= y < HEIGHT:
@@ -36,9 +40,12 @@ class NeoStrip:
 
         self.pixels.show()
 
-    def reset(self):
-        self.pixels.fill((0, 0, 0))
-        self.pixels.show()
+    def read(self):
+        result = dict()
+        for x in range(WIDTH):
+            for y in range(HEIGHT):
+                result[(x,y)] = self.pixels[coords[(x,y)]]
+        return result
 
 
 impl = NeoStrip()

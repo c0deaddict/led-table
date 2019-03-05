@@ -1,8 +1,20 @@
 # Open Pixel Control
 import asyncio
 
-from .settings import HOST, OPC_PORT
 from .log import logger
+from .settings import HOST, OPC_PORT
+from .scheduler import scheduler
+from .leds import display
+
+
+async def do_paint(client_id, frame):
+    if await scheduler.claim(client_id):
+        if await display.paint(frame):
+            return 'painted'
+        else:
+            return 'dropped'
+    else:
+        return 'denied'
 
 
 class UdpServer(asyncio.DatagramProtocol):
@@ -14,12 +26,13 @@ class UdpServer(asyncio.DatagramProtocol):
         self.transport = transport
 
     def datagram_received(self, data, addr):
-        message = data.decode()
         print('Received %r from %s' % (message, addr))
         print('Send %r to %s' % (message, addr))
-        self.transport.sendto(data, addr)
+        asyncio.ensure_future(do_paint(client_id, frame))
+        # self.transport.sendto(data, addr)
 
         try:
+            # TODO schedule a call to do_paint, don't return anything.
             self.received.put_nowait((data, addr))
         except asyncio.QueueFull:
             print(f'dropped packet size {len(data)} from {addr}')
@@ -48,19 +61,6 @@ class TcpServer:
     def __init__(self):
         self.server = None
 
-    async def handle_tcp_message(self, reader, writer):
-        data = await reader.read(100)
-        message = data.decode()
-        addr = writer.get_extra_info('peername')
-        print("Received %r from %r" % (message, addr))
-
-        print("Send: %r" % message)
-        writer.write(data)
-        await writer.drain()
-
-        print("Close the client socket")
-        writer.close()
-
     async def start(self):
         if self.server is None:
             self.server = await asyncio.start_server(
@@ -75,6 +75,16 @@ class TcpServer:
             finally:
                 self.server = None
                 logger.info('Closed TCP socket')
+
+    async def handle_tcp_message(self, reader, writer):
+        data = await reader.read(100)
+        addr = writer.get_extra_info('peername')
+        client_id = ('tcp', addr)
+        frame = dict()
+        resp = await do_paint(client_id, frame)
+        writer.write(resp)
+        await writer.drain()
+        writer.close()
 
 
 udp_server = UdpServer()

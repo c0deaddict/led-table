@@ -30,3 +30,11 @@ class Timer:
 
     def cancel(self):
         self._task.cancel()
+
+
+def is_holiday(date):
+    try:
+        import holidays
+        return date in holidays.Netherlands()
+    except:
+        return False

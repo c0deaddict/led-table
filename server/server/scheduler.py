@@ -3,8 +3,26 @@ from datetime import datetime, timedelta
 
 from .log import logger
 from .leds import display
-from .settings import CLAIM_EXPIRE
-from .utils import Timer
+from .settings import (
+    CLAIM_EXPIRE,
+    SCHEDULE_ON_TIME,
+    SCHEDULE_ON_WEEKENDS,
+    SCHEDULE_ON_HOLIDAYS,
+)
+from .utils import Timer, is_holiday
+from .screensaver import MaybeScreensaver
+
+
+def in_schedule(dt):
+    if is_holiday(dt):
+        return False
+
+    # 0 = mon, ... 5 = sat, 6 = sun
+    if not SCHEDULE_ON_HOLIDAYS and dt.weekday() in [5, 6]:
+        return False
+
+    start, end = SCHEDULE_TIME
+    return start <= dt.time() < end
 
 
 class Scheduler:
@@ -18,41 +36,68 @@ class Scheduler:
     met, the screensaver is started. It is stopped as soon as a client
     does a claim.
     """
+
     def __init__(self):
         self.client_id = None
         self.claimed_at = None
         self.timer = None
+        self.screensaver = None
 
     async def start(self):
         self.timer = Timer(5.0, self._timer_callback)
-        logger.info('Scheduler started')
+        self.screensaver = MaybeScreensaver()
+        await self.screensaver.start()
+        logger.info('Scheduler: started')
 
     async def stop(self):
         self.timer.cancel()
-        logger.info('Scheduler stopped')
+        self.timer = None
+        await self.screensaver.stop()
+        self.screensaver = None
+        logger.info('Scheduler: stopped')
 
     async def _timer_callback(self):
-        if self.client_id is not None:
+        if not in_schedule(datetime.now()):
+            self._sleep()
+        elif self.client_id is not None:
             if self.claimed_at + CLAIM_EXPIRE < datetime.now():
-                self.client_id = None
-                self.claimed_at = None
-        else:
-            pass
+                logger.info(f'Scheduler: {self.client_id} idled and released the display')
+                self._release()
 
     async def claim(self, client_id):
+        # Reject claims outside "ON" schedule.
+        if not in_schedule(datetime.now()):
+            return False
+
         if self.client_id == client_id:
-            # Client already has the claim.
+            # Client already has the claim, extend the claim.
             self.claimed_at = datetime.now()
             return True
         elif self.client_id is None:
             self.client_id = client_id
             self.claimed_at = datetime.now()
-
-            # TODO stop screensaver (if running).
+            logger.info(f'Scheduler: {self.client_id} claimed the display')
+            await self.screensaver.stop()
             return True
         else:
             return False
 
+    async def release(self, client_id):
+        if self.client_id != client_id:
+            logger.info(f'Scheduler: client {client_id} tried to release without a claim')
+        else:
+            await self._release()
+
+    async def _release(self):
+        self.client_id = None
+        self.claimed_at = None
+        await self.screensaver.start()
+
+    async def _sleep(self):
+        self.client_id = None
+        self.claimed_at = None
+        await self.screensaver.stop()
+        await display.reset()
 
 
 scheduler = Scheduler()

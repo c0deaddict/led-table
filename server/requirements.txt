@@ -3,3 +3,4 @@ rpi_ws281x
 RPI.GPIO
 adafruit-blinka
 adafruit-circuitpython-neopixel
+holidays

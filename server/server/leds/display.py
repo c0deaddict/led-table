@@ -22,7 +22,7 @@ class Display:
         self.impl = impl
 
     async def _run(self, fn, *args):
-        await self.loop.run_in_executor(self.executor, fn, *args)
+        return await self.loop.run_in_executor(self.executor, fn, *args)
 
     async def start(self):
         logger.info('Starting up LEDs')
@@ -36,6 +36,9 @@ class Display:
         self.executor.shutdown()
         self.executor = None
         self.loop = None
+
+    async def reset(self):
+        await self._run(self.impl.reset)
 
     async def paint(self, frame):
         """
@@ -57,3 +60,6 @@ class Display:
             await self._run(self.impl.paint, frame)
 
         return True
+
+    async def read(self):
+        return await self._run(self.impl.read)
