@@ -64,9 +64,8 @@ class UdpServer(asyncio.DatagramProtocol):
         client_id = f'udp://{addr[0]}:{addr[1]}'
         try:
             frame = parse_frame(data)
-        except ParseError as e:
-            logger.error(f'Error parsing frame from {client_id}', e)
-            pass
+        except ParseError:
+            logger.exception(f'Error parsing frame from {client_id}')
         else:
             asyncio.ensure_future(do_paint(client_id, frame))
 
@@ -114,13 +113,13 @@ class TcpServer:
         client_id = f'tcp://{addr[0]}:{addr[1]}'
         try:
             frame = parse_frame(header + payload)
-        except ParseError as e:
-            logger.error(f'Error parsing frame from {client_id}', e)
+        except ParseError:
+            logger.exception(f'Error parsing frame from {client_id}')
             resp = 'parse_error'
         else:
             resp = await do_paint(client_id, frame)
 
-        writer.write(resp + '\n')
+        writer.write((resp + '\n').encode())
         await writer.drain()
         writer.close()
 
