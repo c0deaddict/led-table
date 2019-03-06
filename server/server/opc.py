@@ -2,7 +2,8 @@
 import asyncio
 
 from .log import logger
-from .settings import HOST, OPC_PORT
+from .utils import chunks
+from .settings import HOST, OPC_PORT, WIDTH
 from .scheduler import scheduler
 from .leds import display
 
@@ -17,44 +18,74 @@ async def do_paint(client_id, frame):
         return 'denied'
 
 
+class ParseError(Exception):
+    pass
+
+
+def parse_frame(data):
+    if len(data) < 4:
+        raise ParseError('message too short')
+
+    channel = data[0]
+    command = data[1]
+    length = (data[2] << 8) | data[3]
+    payload = data[4:]
+
+    if len(payload) != length:
+        raise ParseError(f'expected {length} bytes, received {len(payload)}')
+
+    frame = dict()
+
+    if command == 0:
+        # Set 8 bit pixel colors
+        for i, (r, g, b) in enumerate(chunks(payload, 3)):
+            x = i % WIDTH
+            y = i // WIDTH
+            frame[(x,y)] = (r, g, b)
+
+    elif command == 1:
+        for (x, y), (r, g, b) in chunks(payload, 5):
+            frame[(x,y)] = (r, g, b)
+
+    else:
+        raise ParseError(f'unknown command: {command}')
+
+    return frame
+
+
 class UdpServer(asyncio.DatagramProtocol):
     def __init__(self):
         self.transport = None
-        self.received = asyncio.Queue(10)
 
     def connection_made(self, transport):
         self.transport = transport
 
     def datagram_received(self, data, addr):
-        print('Received %r from %s' % (message, addr))
-        print('Send %r to %s' % (message, addr))
-        asyncio.ensure_future(do_paint(client_id, frame))
-        # self.transport.sendto(data, addr)
-
+        client_id = f'udp://{addr[0]}:{addr[1]}'
         try:
-            # TODO schedule a call to do_paint, don't return anything.
-            self.received.put_nowait((data, addr))
-        except asyncio.QueueFull:
-            print(f'dropped packet size {len(data)} from {addr}')
+            frame = parse_frame(data)
+        except ParseError as e:
+            logger.error(f'Error parsing frame from {client_id}', e)
+            pass
+        else:
+            asyncio.ensure_future(do_paint(client_id, frame))
 
     def error_received(self, exc):
         pass
 
     async def start(self):
-        if self.transport is None:
-            loop = asyncio.get_running_loop()
-            self.transport, protocol = await loop.create_datagram_endpoint(
-                lambda: self, local_addr=(HOST, OPC_PORT))
-            logger.info(f'Listening on UDP {HOST}:{OPC_PORT}')
+        loop = asyncio.get_running_loop()
+        self.transport, protocol = await loop.create_datagram_endpoint(
+            lambda: self, local_addr=(HOST, OPC_PORT))
+        logger.info(f'Listening on UDP {HOST}:{OPC_PORT}')
 
     async def stop(self):
-        if self.transport:
-            try:
-                self.transport.close()
-            finally:
-                self.transport = None
-                self.received = None
-                logger.info('Closed UDP socket')
+        try:
+            self.transport.close()
+        finally:
+            self.transport = None
+            self.received = None
+            logger.info('Closed UDP socket')
 
 
 class TcpServer:
@@ -62,27 +93,34 @@ class TcpServer:
         self.server = None
 
     async def start(self):
-        if self.server is None:
-            self.server = await asyncio.start_server(
-                self.handle_tcp_message, HOST, OPC_PORT)
-            logger.info(f'Listening on TCP {HOST}:{OPC_PORT}')
+        self.server = await asyncio.start_server(
+            self.handle_tcp_message, HOST, OPC_PORT)
+        logger.info(f'Listening on TCP {HOST}:{OPC_PORT}')
 
     async def stop(self):
-        if self.server:
-            try:
-                self.server.close()
-                await self.server.wait_closed()
-            finally:
-                self.server = None
-                logger.info('Closed TCP socket')
+        try:
+            self.server.close()
+            await self.server.wait_closed()
+        finally:
+            self.server = None
+            logger.info('Closed TCP socket')
 
     async def handle_tcp_message(self, reader, writer):
-        data = await reader.read(100)
+        header = await reader.read(4)
+        length = (header[2] << 8) | header[3]
+        payload = await reader.read(length)
+
         addr = writer.get_extra_info('peername')
-        client_id = ('tcp', addr)
-        frame = dict()
-        resp = await do_paint(client_id, frame)
-        writer.write(resp)
+        client_id = f'tcp://{addr[0]}:{addr[1]}'
+        try:
+            frame = parse_frame(header + payload)
+        except ParseError as e:
+            logger.error(f'Error parsing frame from {client_id}', e)
+            resp = 'parse_error'
+        else:
+            resp = await do_paint(client_id, frame)
+
+        writer.write(resp + '\n')
         await writer.drain()
         writer.close()
 

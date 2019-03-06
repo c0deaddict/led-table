@@ -38,3 +38,13 @@ def is_holiday(date):
         return date in holidays.Netherlands()
     except:
         return False
+
+
+def chunks(l, n):
+    """Yield successive n-sized chunks from l.
+
+    Taken from https://stackoverflow.com/a/312464
+    Changed to only return chunks of size `n`, NOT smaller.
+    """
+    for i in range(0, len(l)-n+1, n):
+        yield l[i:i + n]
