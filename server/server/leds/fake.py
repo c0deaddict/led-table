@@ -24,7 +24,7 @@ class FakeLeds:
             if 0 <= x < WIDTH and 0 <= y < HEIGHT:
                 num += 1
 
-        logger.info(f'Painting Fake LEDs ({num} updates, .5 sec)')
+        logger.info('Painting Fake LEDs ({0} updates, .5 sec)'.format(num))
         time.sleep(.5)
 
     def read(self):

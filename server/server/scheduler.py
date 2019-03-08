@@ -61,7 +61,7 @@ class Scheduler:
             self._sleep()
         elif self.client_id is not None:
             if self.claimed_at + CLAIM_EXPIRE < datetime.now():
-                logger.info(f'Scheduler: {self.client_id} idled and released the display')
+                logger.info('Scheduler: {0} idled and released the display'.format(self.client_id))
                 self._release()
 
     async def claim(self, client_id):
@@ -76,7 +76,7 @@ class Scheduler:
         elif self.client_id is None:
             self.client_id = client_id
             self.claimed_at = datetime.now()
-            logger.info(f'Scheduler: {self.client_id} claimed the display')
+            logger.info('Scheduler: {0} claimed the display'.format(self.client_id))
             await self.screensaver.stop()
             return True
         else:
@@ -84,7 +84,7 @@ class Scheduler:
 
     async def release(self, client_id):
         if self.client_id != client_id:
-            logger.info(f'Scheduler: client {client_id} tried to release without a claim')
+            logger.info('Scheduler: client {0} tried to release without a claim'.format(client_id))
         else:
             await self._release()
 

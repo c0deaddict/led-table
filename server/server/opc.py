@@ -32,7 +32,7 @@ def parse_frame(data):
     payload = data[4:]
 
     if len(payload) != length:
-        raise ParseError(f'expected {length} bytes, received {len(payload)}')
+        raise ParseError('expected {0} bytes, received {1}'.format(length, len(payload)))
 
     frame = dict()
 
@@ -48,7 +48,7 @@ def parse_frame(data):
             frame[(x,y)] = (r, g, b)
 
     else:
-        raise ParseError(f'unknown command: {command}')
+        raise ParseError('unknown command: {0}'.format(command))
 
     return frame
 
@@ -61,11 +61,11 @@ class UdpServer(asyncio.DatagramProtocol):
         self.transport = transport
 
     def datagram_received(self, data, addr):
-        client_id = f'udp://{addr[0]}:{addr[1]}'
+        client_id = 'udp://{0}:{1}'.format(*addr)
         try:
             frame = parse_frame(data)
         except ParseError:
-            logger.exception(f'Error parsing frame from {client_id}')
+            logger.exception('Error parsing frame from {0}'.format(client_id))
         else:
             asyncio.ensure_future(do_paint(client_id, frame))
 
@@ -76,7 +76,7 @@ class UdpServer(asyncio.DatagramProtocol):
         loop = asyncio.get_running_loop()
         self.transport, protocol = await loop.create_datagram_endpoint(
             lambda: self, local_addr=(HOST, OPC_PORT))
-        logger.info(f'Listening on UDP {HOST}:{OPC_PORT}')
+        logger.info('Listening on UDP {0}:{1}'.format(HOST, OPC_PORT))
 
     async def stop(self):
         try:
@@ -94,7 +94,7 @@ class TcpServer:
     async def start(self):
         self.server = await asyncio.start_server(
             self.handle_tcp_message, HOST, OPC_PORT)
-        logger.info(f'Listening on TCP {HOST}:{OPC_PORT}')
+        logger.info('Listening on TCP {0}:{1}'.format(HOST, OPC_PORT))
 
     async def stop(self):
         try:
@@ -110,11 +110,11 @@ class TcpServer:
         payload = await reader.read(length)
 
         addr = writer.get_extra_info('peername')
-        client_id = f'tcp://{addr[0]}:{addr[1]}'
+        client_id = 'tcp://{0}:{1}'.format(*addr)
         try:
             frame = parse_frame(header + payload)
         except ParseError:
-            logger.exception(f'Error parsing frame from {client_id}')
+            logger.exception('Error parsing frame from {0}'.format(client_id))
             resp = 'parse_error'
         else:
             resp = await do_paint(client_id, frame)

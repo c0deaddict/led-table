@@ -42,7 +42,7 @@ class Screensaver:
 
     async def next_prog(self):
         Prog = choice(programs)
-        logger.info(f'Starting screensaver program: {Prog}')
+        logger.info('Starting screensaver program: {0}'.format(Prog))
         self.prog = Prog()
         self.start_prog = datetime.now()
         self.timeout = 1.0 / self.prog.fps
