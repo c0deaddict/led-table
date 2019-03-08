@@ -42,12 +42,17 @@ class Screensaver:
 
     async def next_prog(self):
         Prog = choice(programs)
+        logger.info(f'Starting screensaver program: {Prog}')
         self.prog = Prog()
         self.start_prog = datetime.now()
         self.timeout = 1.0 / self.prog.fps
         self.t = 0
         if self.prog.reset:
             await display.reset()
+            initial = None
+        else:
+            initial = await display.read()
+        await self.prog.start(initial)
 
     async def _loop(self):
         while True:
@@ -63,6 +68,7 @@ class Screensaver:
                 await asyncio.sleep(timeout)
             else:
                 logger.info('Screensaver lagging')
+
 
 class MaybeScreensaver(Screensaver):
     """

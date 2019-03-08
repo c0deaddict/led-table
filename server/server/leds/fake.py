@@ -1,4 +1,5 @@
 import time
+from collections import defaultdict
 
 from ..log import logger
 from ..settings import WIDTH, HEIGHT
@@ -25,6 +26,9 @@ class FakeLeds:
 
         logger.info(f'Painting Fake LEDs ({num} updates, .5 sec)')
         time.sleep(.5)
+
+    def read(self):
+        return defaultdict(lambda: (0,0,0))
 
 
 impl = FakeLeds()

@@ -20,7 +20,7 @@ SCHEDULE_ON_WEEKENDS = False
 SCHEDULE_ON_HOLIDAYS = False
 
 # Run each program for this amount of time.
-SCREENSAVER_CHANGE = timedelta(minutes=2)
+SCREENSAVER_CHANGE = timedelta(seconds=15)
 
 # Screensaver is enabled this percentage of the time,
 # in windows of a minimum amount of time.
