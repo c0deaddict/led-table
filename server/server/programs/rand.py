@@ -13,7 +13,7 @@ def rand_color():
 
 
 class Random(Program):
-    fps = 60
+    fps = 30
     reset = True
 
     async def animate(self, t):

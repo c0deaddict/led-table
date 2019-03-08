@@ -5,7 +5,7 @@ from ..settings import WIDTH, HEIGHT
 
 
 class Sparkle(Program):
-    fps = 60
+    fps = 30
     reset = False
 
     def __init__(self):

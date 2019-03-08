@@ -69,11 +69,12 @@ class Screensaver:
             else:
                 logger.info('Screensaver lagging')
 
-
 class MaybeScreensaver(Screensaver):
     """
     Maybe start screensaver.
     TODO implement.
+    TODO have a way to set 'no program' on the screensaver
+         (it should display reset when no program).
     """
     async def start(self):
         await super().start()
