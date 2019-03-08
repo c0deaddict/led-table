@@ -8,7 +8,7 @@ WEB_PORT = 8080
 WIDTH = 15
 HEIGHT = 15
 
-DISPLAY_IMPL = 'server.leds.fake'
+DISPLAY_IMPL = 'server.leds.neo'
 
 CLAIM_EXPIRE = timedelta(minutes=5)
 

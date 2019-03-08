@@ -27,7 +27,7 @@ class Worker:
             logger.info('Dropping frame')
             return False
 
-        loop = asyncio.get_running_loop()
+        loop = asyncio.get_event_loop()
         async with self.lock:
             print(loop)
             logger.info('Painting')

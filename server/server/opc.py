@@ -73,7 +73,7 @@ class UdpServer(asyncio.DatagramProtocol):
         pass
 
     async def start(self):
-        loop = asyncio.get_running_loop()
+        loop = asyncio.get_event_loop()
         self.transport, protocol = await loop.create_datagram_endpoint(
             lambda: self, local_addr=(HOST, OPC_PORT))
         logger.info('Listening on UDP {0}:{1}'.format(HOST, OPC_PORT))

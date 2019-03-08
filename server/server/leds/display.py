@@ -26,7 +26,7 @@ class Display:
 
     async def start(self):
         logger.info('Starting up LEDs')
-        self.loop = asyncio.get_running_loop()
+        self.loop = asyncio.get_event_loop()
         self.executor = ThreadPoolExecutor(max_workers=1)
         await self._run(self.impl.start)
 
