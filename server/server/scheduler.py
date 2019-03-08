@@ -21,7 +21,7 @@ def in_schedule(dt):
     if not SCHEDULE_ON_HOLIDAYS and dt.weekday() in [5, 6]:
         return False
 
-    start, end = SCHEDULE_TIME
+    start, end = SCHEDULE_ON_TIME
     return start <= dt.time() < end
 
 
