@@ -18,15 +18,27 @@ class Display:
     def __init__(self, impl):
         self.impl = impl
         self.q = Queue(1)
+        # TODO: add another queue that has a higher priority than self.q,
+        # and which does not have a bound.
         self.stop_event = Event()
-        self.worker = Thread(target=self._loop)
+        self.worker = Thread(target=self._worker)
+        self.loop = asyncio.get_event_loop()
 
-    def _run(self, fn, *args):
+    def _run(self, fn, args=[], resolve=None):
         try:
-            self.q.put_nowait((lambda: fn(*args), time.time()))
+            self.q.put_nowait((lambda: fn(*args), resolve))
             return True
         except Full:
             return False
+
+    async def _call(self, fn, args=[], fallback=None):
+        future = asyncio.Future()
+        def resolve(result):
+            future.set_result(result)
+        if self._run(fn, args, resolve):
+            return await future
+        else:
+            return fallback
 
     async def start(self):
         logger.info('Starting up LEDs')
@@ -54,22 +66,21 @@ class Display:
             True if the frame was painted, False it was dropped.
 
         """
-        if not self._run(self.impl.paint, frame):
+        if not self._run(self.impl.paint, [frame]):
             logger.info('Dropping frame')
             return False
 
         return True
 
     async def read(self):
-        return dict()
-        # return await self._run(self.impl.read)
+        return await self._call(self.impl.read, [], dict())
 
-    def _loop(self):
+    def _worker(self):
         while not self.stop_event.is_set():
             try:
-                fn, t = self.q.get(timeout=1.0)
-                d = time.time() - t
-                logger.info('Delay: {}'.format(d))
-                fn()
+                fn, resolve = self.q.get(timeout=1.0)
+                result = fn()
+                if resolve:
+                    self.loop.call_soon_threadsafe(resolve, result)
             except Empty:
                 pass

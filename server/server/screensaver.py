@@ -22,12 +22,16 @@ class Screensaver:
     prog = None
     start_prog = None
     timeout = None
+    lock = asyncio.Lock()
     t = None
 
     async def start(self):
         if self.task is None:
-            self.task = asyncio.ensure_future(self._loop())
-            await self.next_prog()
+            # Need a lock to ensure _loop doesn't run before self.prog
+            # has been properly initialized.
+            async with self.lock:
+                self.task = asyncio.ensure_future(self._loop())
+                await self.next_prog()
             logger.info('Screensaver started')
 
     async def stop(self):
@@ -49,25 +53,28 @@ class Screensaver:
         self.t = 0
         if self.prog.reset:
             await display.reset()
-            initial = None
+            initial = dict()
         else:
             initial = await display.read()
         await self.prog.start(initial)
 
     async def _loop(self):
         while True:
-            if datetime.now() - self.start_prog > SCREENSAVER_CHANGE:
-                await self.next_prog()
+            async with self.lock:
+                if datetime.now() - self.start_prog > SCREENSAVER_CHANGE:
+                    await self.next_prog()
 
-            start = time.time()
-            frame = await self.prog.animate(self.t)
-            await display.paint(frame)
-            elapsed = time.time() - start
-            timeout = self.timeout - elapsed
-            if timeout > 0:
-                await asyncio.sleep(timeout)
-            else:
-                logger.info('Screensaver lagging')
+                start = time.time()
+                frame = await self.prog.animate(self.t)
+                await display.paint(frame)
+                self.t += 1
+                elapsed = time.time() - start
+                timeout = self.timeout - elapsed
+                if timeout > 0:
+                    await asyncio.sleep(timeout)
+                else:
+                    logger.info('Screensaver lagging')
+
 
 class MaybeScreensaver(Screensaver):
     """

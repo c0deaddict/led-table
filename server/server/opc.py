@@ -44,7 +44,7 @@ def parse_frame(data):
             frame[(x,y)] = (r, g, b)
 
     elif command == 1:
-        for (x, y), (r, g, b) in chunks(payload, 5):
+        for x, y, r, g, b in chunks(payload, 5):
             frame[(x,y)] = (r, g, b)
 
     else:

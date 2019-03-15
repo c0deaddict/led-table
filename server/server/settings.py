@@ -10,7 +10,7 @@ HEIGHT = 15
 
 DISPLAY_IMPL = 'server.leds.neo'
 
-CLAIM_EXPIRE = timedelta(minutes=5)
+CLAIM_EXPIRE = timedelta(seconds=15)
 
 # Table is powered on in this time window (from 08:00 until 18:00).
 SCHEDULE_ON_TIME = [time(8, 0, 0), time(18, 0, 0)]

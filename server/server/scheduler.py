@@ -62,7 +62,7 @@ class Scheduler:
         elif self.client_id is not None:
             if self.claimed_at + CLAIM_EXPIRE < datetime.now():
                 logger.info('Scheduler: {0} idled and released the display'.format(self.client_id))
-                self._release()
+                await self._release()
 
     async def claim(self, client_id):
         # Reject claims outside "ON" schedule.
