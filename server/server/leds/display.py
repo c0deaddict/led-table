@@ -1,8 +1,8 @@
 import time
 import asyncio
+from queue import Queue, Empty, Full
+from threading import Thread, Event
 from importlib import import_module
-
-from concurrent.futures import ThreadPoolExecutor
 
 from .. import settings
 from ..log import logger
@@ -16,29 +16,31 @@ class Display:
     TODO: add a FPS counter somewhere, and count the number of dropped frames.
     """
     def __init__(self, impl):
-        self.loop = None
-        self.executor = None
-        self.lock = asyncio.Lock()
         self.impl = impl
+        self.q = Queue(1)
+        self.stop_event = Event()
+        self.worker = Thread(target=self._loop)
 
-    async def _run(self, fn, *args):
-        return await self.loop.run_in_executor(self.executor, fn, *args)
+    def _run(self, fn, *args):
+        try:
+            self.q.put_nowait((lambda: fn(*args), time.time()))
+            return True
+        except Full:
+            return False
 
     async def start(self):
         logger.info('Starting up LEDs')
-        self.loop = asyncio.get_event_loop()
-        self.executor = ThreadPoolExecutor(max_workers=1)
-        await self._run(self.impl.start)
+        self.worker.start()
+        self._run(self.impl.start)
 
     async def stop(self):
         logger.info('Shutting down LEDs')
-        await self._run(self.impl.stop)
-        self.executor.shutdown()
-        self.executor = None
-        self.loop = None
+        self._run(self.impl.stop)
+        self.stop_event.set()
+        self.worker.join()
 
     async def reset(self):
-        await self._run(self.impl.reset)
+        self._run(self.impl.reset)
 
     async def paint(self, frame):
         """
@@ -52,14 +54,22 @@ class Display:
             True if the frame was painted, False it was dropped.
 
         """
-        if self.lock.locked():
+        if not self._run(self.impl.paint, frame):
             logger.info('Dropping frame')
             return False
-
-        async with self.lock:
-            await self._run(self.impl.paint, frame)
 
         return True
 
     async def read(self):
-        return await self._run(self.impl.read)
+        return dict()
+        # return await self._run(self.impl.read)
+
+    def _loop(self):
+        while not self.stop_event.is_set():
+            try:
+                fn, t = self.q.get(timeout=1.0)
+                d = time.time() - t
+                logger.info('Delay: {}'.format(d))
+                fn()
+            except Empty:
+                pass

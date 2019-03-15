@@ -18,7 +18,7 @@ class Sparkle(Program):
     async def animate(self, t):
         frame = dict()
         if self.prev:
-            frame[self.prev] = self.initial[self.prev]
+            frame[self.prev] = self.initial.get(self.prev, (0, 0, 0))
 
         x = randint(0, WIDTH - 1)
         y = randint(0, HEIGHT - 1)
