@@ -1,7 +1,36 @@
 <html>
 <head>
   <title>Led table</title>
+  <script src="/static/app.js"></script>
+  <style>
+    ul.menu {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    ul.menu li a {
+      margin: 0.2em 0;
+      padding: 0.5em;
+      display: block;
+      border: 1px solid #111155;
+      background-color: #112266;
+      color: white;
+      text-decoration: none;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
   <h1>Led table</h1>
+  <div id="menu">
+    <ul class="menu">
+      <li><a href="#" onclick="runScreensaverProgram('random');">Random</a></li>
+      <li><a href="#" onclick="runScreensaverProgram('sweep');">Sweep</a></li>
+      <li><a href="#" onclick="runScreensaverProgram('sparkle');">Sparkle</a></li>
+      <li><a href="#" onclick="runScreensaverProgram('full_rand');">Full Random</a></li>
+      <li><a href="#" onclick="stopScreensaver();">Stop</a></li>
+      <li><a href="#" onclick="resetDisplay();">Reset</a></li>
+      <li><a href="#" onclick="shutdown();">Shutdown</a></li>
+    </ul>
+  </div>
 </body>

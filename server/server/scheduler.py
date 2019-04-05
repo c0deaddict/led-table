@@ -67,6 +67,7 @@ class Scheduler:
     async def claim(self, client_id):
         # Reject claims outside "ON" schedule.
         if not in_schedule(datetime.now()):
+            logger.info('Scheduler rejecting claim by {0} outside ON schedule'.format(client_id))
             return False
 
         if self.client_id == client_id:

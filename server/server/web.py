@@ -11,13 +11,19 @@ from .log import logger
 from .request_logger import request_logger
 from .scheduler import scheduler
 from .screensaver import Screensaver, programs
+from .leds import display
 
 
-async def _start_screensaver(app, prog):
+async def _stop_screensaver(app):
     s = app['active_screensaver']
     if s is not None:
         logger.info('Stopping current screensaver program')
         await s.stop()
+        app['active_screensaver'] = None
+
+
+async def _start_screensaver(app, prog):
+    await _stop_screensaver(app)
     s = Screensaver(prog)
     app['active_screensaver'] = s
     await s.start()
@@ -41,6 +47,17 @@ async def run_screensaver_program(request):
 
     await _start_screensaver(request.app, Prog())
     return web.Response(status=200, body='thank you come again')
+
+
+async def stop_screensaver(request):
+    await _stop_screensaver(request.app)
+    await display.reset()
+    return web.Response(status=200, body='roger')
+
+
+async def reset_display(request):
+    await display.reset()
+    return web.Response(status=200, body='ack')
 
 
 async def request_shutdown(request):
@@ -81,9 +98,10 @@ app.on_shutdown.append(close_websockets)
 app.router.add_get('/', get_index)
 app.router.add_static('/static', 'static/')
 
-# TODO make this POST when final!
-app.router.add_get('/screensaver/run/{program}', run_screensaver_program)
-app.router.add_get('/shutdown', request_shutdown)
+app.router.add_post('/screensaver/run/{program}', run_screensaver_program)
+app.router.add_post('/screensaver/stop', stop_screensaver)
+app.router.add_post('/display/reset', reset_display)
+app.router.add_post('/shutdown', request_shutdown)
 
 app.router.add_get('/ws', ws_handler)
 
