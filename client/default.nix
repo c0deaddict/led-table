@@ -10,6 +10,15 @@ opencv3WithGtk = pythonPackages.opencv3.override {
   enableFfmpeg = true;
 };
 
+pyrr = with pkgs; callPackage ./pyrr.nix {
+    inherit (pythonPackages)
+      buildPythonPackage
+      fetchPypi
+      setuptools
+      multipledispatch
+      numpy;
+};
+
 in
 
 stdenv.mkDerivation rec {
@@ -23,10 +32,10 @@ stdenv.mkDerivation rec {
   buildInputs = [
     python
     opencv3WithGtk
+    pyrr
     ] ++ (with pythonPackages; [
       numpy
       pillow
-      pyrr
       pyqt5
       moderngl
     ]);

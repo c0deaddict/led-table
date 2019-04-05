@@ -3,9 +3,10 @@ from .sparkle import Sparkle
 from .sweep import Sweep
 from .full_rand import FullRand
 
-programs = [
-    Random,
-    Sparkle,
-    Sweep,
-    FullRand,
-]
+programs = {
+    'random': Random,
+    'sparkle': Sparkle,
+    'sweep': Sweep,
+    'full_rand': FullRand,
+}
+

@@ -10,7 +10,7 @@ from .settings import (
     SCHEDULE_ON_HOLIDAYS,
 )
 from .utils import Timer, is_holiday
-from .screensaver import MaybeScreensaver
+from .screensaver import MaybeScreensaverLoop
 
 
 def in_schedule(dt):
@@ -45,7 +45,7 @@ class Scheduler:
 
     async def start(self):
         self.timer = Timer(5.0, self._timer_callback)
-        self.screensaver = MaybeScreensaver()
+        self.screensaver = MaybeScreensaverLoop()
         await self.screensaver.start()
         logger.info('Scheduler: started')
 
@@ -58,7 +58,7 @@ class Scheduler:
 
     async def _timer_callback(self):
         if not in_schedule(datetime.now()):
-            self._sleep()
+            await self._sleep()
         elif self.client_id is not None:
             if self.claimed_at + CLAIM_EXPIRE < datetime.now():
                 logger.info('Scheduler: {0} idled and released the display'.format(self.client_id))

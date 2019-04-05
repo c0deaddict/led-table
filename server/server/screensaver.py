@@ -16,6 +16,57 @@ from .programs import programs
 
 class Screensaver:
     """
+    Runs a screensaver program.
+    """
+    task = None
+    prog = None
+    start_prog = None
+    timeout = None
+    lock = asyncio.Lock()
+    t = None
+
+    def __init__(self, prog):
+        self.prog = prog
+
+    async def start(self):
+        if self.task is None:
+            # Need a lock to ensure _loop doesn't run before self.prog
+            # has been properly initialized.
+            async with self.lock:
+                self.task = asyncio.ensure_future(self._loop())
+                self.timeout = 1.0 / self.prog.fps
+                self.t = 0
+                if self.prog.reset:
+                    await display.reset()
+                    initial = dict()
+                else:
+                    initial = await display.read()
+                await self.prog.start(initial)
+
+    async def stop(self):
+        if self.task:
+            self.task.cancel()
+            self.task = None
+            self.timeout = None
+            self.t = None
+
+    async def _loop(self):
+        while True:
+            async with self.lock:
+                start = time.time()
+                frame = await self.prog.animate(self.t)
+                await display.paint(frame)
+                self.t += 1
+                elapsed = time.time() - start
+                timeout = self.timeout - elapsed
+                if timeout > 0:
+                    await asyncio.sleep(timeout)
+                else:
+                    logger.info('Screensaver lagging')
+
+
+class ScreensaverLoop:
+    """
     Cycles randomly through various screensaver programs.
     """
     task = None
@@ -45,8 +96,8 @@ class Screensaver:
             logger.info('Screensaver stopped')
 
     async def next_prog(self):
-        Prog = choice(programs)
-        logger.info('Starting screensaver program: {0}'.format(Prog))
+        name, Prog = choice(list(programs.items()))
+        logger.info('Starting screensaver program: {0}'.format(name))
         self.prog = Prog()
         self.start_prog = datetime.now()
         self.timeout = 1.0 / self.prog.fps
@@ -76,7 +127,7 @@ class Screensaver:
                     logger.info('Screensaver lagging')
 
 
-class MaybeScreensaver(Screensaver):
+class MaybeScreensaverLoop(ScreensaverLoop):
     """
     Maybe start screensaver.
     TODO implement.
@@ -84,7 +135,9 @@ class MaybeScreensaver(Screensaver):
          (it should display reset when no program).
     """
     async def start(self):
-        await super().start()
+        pass
+        # await super().start()
 
     async def stop(self):
-        await super().stop()
+        pass
+        # await super().stop()
