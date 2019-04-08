@@ -1,12 +1,12 @@
 import json
 import asyncio
 
-from aiohttp import web, WSCloseCode
+from aiohttp import web, WSCloseCode, WSMsgType
 import os
 
 from aiohttp.web_fileresponse import FileResponse
 
-from . import settings, leds
+from . import settings, opc
 from .log import logger
 from .request_logger import request_logger
 from .scheduler import scheduler
@@ -68,13 +68,26 @@ async def ws_handler(request):
     ws = web.WebSocketResponse(protocols=('led-table',))
     await ws.prepare(request)
 
+    client_id = 'http://{0}'.format(request.remote)
     request.app['clients'].append(ws)
 
     try:
         async for msg in ws:
-            logger.info('Message received: {}'.format(msg))
-            if msg.data == 'ping':
-                await ws.send_str(json.dumps('pong'))
+            if msg.type == WSMsgType.TEXT:
+                logger.info('Text message received: {}'.format(msg))
+                if msg.data == 'ping':
+                    await ws.send_str('pong')
+            elif msg.type == WSMsgType.BINARY:
+                # logger.info('Binary message received: {}'.format(msg))
+                try:
+                    frame = opc.parse_frame(msg.data)
+                    result = await opc.do_paint(client_id, frame)
+                except opc.ParseError:
+                    logger.exception('WebSocket OPC parse error')
+                    result = 'parse_error'
+                await ws.send_str(result)
+            elif msg.type == WSMsgType.ERROR:
+                logger.error('WebSocket connection closed with exception:', ws.exception())
     finally:
         request.app['clients'].remove(ws)
 
