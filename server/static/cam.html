@@ -1,0 +1,24 @@
+<html>
+<head>
+  <title>Led table Camera</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="/static/app.js"></script>
+  <style>
+    body {
+      padding: 1.0em;
+    }
+
+    #canvas {
+      width: 400px;
+      height: 400px;
+      display: block;
+      image-rendering: crisp-edges;
+    }
+  </style>
+</head>
+<body>
+  <h1>Led table - Cam</h1>
+  <video id="video" width="640" height="480"></video>
+  <canvas id="canvas" width="15" height="15"></canvas>
+  <script src="/static/cam.js"></script>
+</body>
