@@ -1,3 +1,5 @@
+/* global LEDS_WIDTH, LEDS_HEIGHT */
+
 const constraints = { audio: true };
 
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -9,7 +11,7 @@ gainNode.gain = 1;
 // https://stackoverflow.com/a/17243070/248948
 /* accepts parameters
  * h  Object = {h:x, s:y, v:z}
- * OR 
+ * OR
  * h, s, v
 */
 function HSVtoRGB(h, s, v) {
@@ -51,11 +53,11 @@ function visualize(ws) {
 
   const WIDTH = canvas.width;
   const HEIGHT = canvas.height;
-  const blockHeight = parseInt((HEIGHT - 16) / 15);
+  const blockHeight = parseInt((HEIGHT - (LEDS_HEIGHT + 1)) / LEDS_HEIGHT);
 
   canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
 
-  const drawAlt = function() {
+  const drawAlt = async function() {
     requestAnimationFrame(drawAlt);
 
     analyser.getByteFrequencyData(dataArrayAlt);
@@ -65,16 +67,7 @@ function visualize(ws) {
 
     const barWidth = parseInt((WIDTH - bufferLengthAlt - 1) / bufferLengthAlt);
     let x = 1;
-
-    const len = 15*15*3;
-    const frame = new Uint8Array(new ArrayBuffer(4 + len));
-    frame[0] = 0;
-    frame[1] = 0;
-    frame[2] = (len >> 8) & 0xff;
-    frame[3] = len & 0xff;
-    for (let i = 4; i < len + 4; i++) {
-      frame[i] = 0;
-    }
+    let frame = Array(LEDS_WIDTH * LEDS_HEIGHT).fill({r: 0, g: 0, b: 0});
 
     for (let i = 0; i < bufferLengthAlt; i++) {
       let amp = dataArrayAlt[i] / 255.0;
@@ -88,28 +81,16 @@ function visualize(ws) {
         canvasCtx.fillStyle = `hsl(${h}, ${s}%, ${v}%)`;
         // canvasCtx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
         canvasCtx.fillRect(x, HEIGHT - y - (y*blockHeight), barWidth, blockHeight);
-        const offset = 4 + 3 * (((15 - y) * 15) + i);
-        const {r, g, b} = HSVtoRGB(h / 360.0, s / 100.0, v / 100.0);
-        frame[offset] = r;
-        frame[offset + 1] = g;
-        frame[offset + 2] = b;
+        frame[y * LEDS_WIDTH + i] = HSVtoRGB(h / 360.0, s / 100.0, v / 100.0);
       }
 
       x += barWidth + 1;
     }
 
-    ws.send(frame);
+    await ws.send(makeFullFrame(frame));
   };
 
   drawAlt();
-}
-
-async function openWebsocket() {
-  return new Promise((resolve, reject) => {
-    const ws = new WebSocket(`ws://${location.host}/ws`);
-    ws.onopen = () => resolve(ws);
-    ws.onerror = (err) => reject(err);
-  });
 }
 
 async function init() {
