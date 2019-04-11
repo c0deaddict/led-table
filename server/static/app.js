@@ -77,3 +77,27 @@ function makePartialFrame(frame) {
 
   return msg;
 }
+
+function diffFrames(oldFrame, newFrame) {
+  const partial = [];
+  if (newFrame.length != oldFrame.length) {
+    console.error(newFrame.length, '!=', oldFrame.length);
+    return partial;
+  }
+
+  for (let i = 0; i < newFrame.length; i++) {
+    const old = oldFrame[i];
+    const {r, g, b} = newFrame[i];
+    if (old.r !== r || old.g !== g || old.b !== b) {
+      const y = parseInt(i / LEDS_WIDTH);
+      const x = i % LEDS_WIDTH;
+      partial.push({x, y, r, g, b});
+    }
+  }
+
+  return partial;
+}
+
+function newEmptyFrame() {
+  return Array(LEDS_WIDTH * LEDS_HEIGHT).fill({ r: 0, g: 0, b: 0 });
+}
