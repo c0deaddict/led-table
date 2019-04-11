@@ -61,6 +61,7 @@ async def reset_display(request):
 
 
 async def request_shutdown(request):
+    os.system('systemctl poweroff')
     return web.Response(status=200, body='initiating shutdown')
 
 

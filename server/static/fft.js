@@ -114,9 +114,10 @@ function visualize(ws) {
       x += barWidth + 1;
     }
 
-    const partial = diffFrames(prevFrame, frame);
-    prevFrame = frame;
-    await ws.send(makePartialFrame(partial));
+    // const partial = diffFrames(prevFrame, frame);
+    // prevFrame = frame;
+    // await ws.send(makePartialFrame(partial));
+    await ws.send(makeFullFrame(frame));
     setTimeout(drawAlt, 1000/fps);
   };
 
