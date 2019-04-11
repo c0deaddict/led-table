@@ -95,18 +95,20 @@ function visualize(ws) {
       let barHeight = amp * HEIGHT;
 
       let strength = parseInt((LEDS_HEIGHT-1) * amp);
-      for (let y = 0; y <= strength; y++) {
-        const h = 360 * (y / 15.0);
-        const s = 100.0 * (1.0 - (i + 1) / 60.0);
-        const v = 100.0 * (0.5 + (i + 1) / 30.0);
-        canvasCtx.fillStyle = `hsl(${h}, ${s}%, ${v}%)`;
-        // canvasCtx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
-        canvasCtx.fillRect(x, HEIGHT - y - y * blockHeight, barWidth, blockHeight);
-        const offset = (y * LEDS_WIDTH) + i;
-        if (offset > LEDS_WIDTH * LEDS_HEIGHT) {
-          console.error(i, y);
+      for (let y = 0; y < LEDS_HEIGHT; y++) {
+        let color;
+        if (y <= strength) {
+          const h = 360 * (y / 15.0);
+          const s = 100.0 * (1.0 - (i + 1) / 60.0);
+          const v = 100.0 * (0.5 + (i + 1) / 30.0);
+          canvasCtx.fillStyle = `hsl(${h}, ${s}%, ${v}%)`;
+          canvasCtx.fillRect(x, HEIGHT - y - y * blockHeight, barWidth, blockHeight);
+          color = HSVtoRGB(h / 360.0, s / 100.0, v / 100.0);
+        } else {
+          color = {r: 0, g: 0, b: 0};
         }
-        frame[y * LEDS_WIDTH + i] = HSVtoRGB(h / 360.0, s / 100.0, v / 100.0);
+
+        frame[y * LEDS_WIDTH + i] = color;
       }
 
       x += barWidth + 1;
