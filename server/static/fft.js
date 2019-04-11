@@ -71,8 +71,15 @@ function visualize(ws) {
 
   let prevFrame = newEmptyFrame();
 
+  const params = new URL(window.location.href).searchParams;
+  let fps = parseInt(params.get('fps'));
+  if (isNaN(fps) || fps < 1 || fps > 60) {
+    fps = 10;
+  }
+  console.log('fps =', fps);
+
   const drawAlt = async function() {
-    requestAnimationFrame(drawAlt);
+    // requestAnimationFrame(drawAlt);
 
     analyser.getByteFrequencyData(dataArrayAlt);
 
@@ -108,6 +115,7 @@ function visualize(ws) {
     const partial = diffFrames(prevFrame, frame);
     prevFrame = frame;
     await ws.send(makePartialFrame(partial));
+    setTimeout(drawAlt, 1000/fps);
   };
 
   drawAlt();
