@@ -15,7 +15,8 @@ function visualize(video, ws) {
     const image = canvasCtx.getImageData(0, 0, LEDS_WIDTH, LEDS_HEIGHT);
     const frame = [];
     for (let i = 0; i < LEDS_WIDTH * LEDS_HEIGHT; i++) {
-      const [r, g, b] = image.data.slice(i * 3, 3 + i * 3);
+      const offset = i * 4; // RGBA
+      const [r, g, b] = image.data.slice(offset, offset + 3);
       frame.push({ r, g, b });
     }
 
