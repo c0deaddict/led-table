@@ -41,7 +41,7 @@ class Bounce(Program):
                 b.dx = 1
                 b.dy = 1
             b.color = rand_color()
-            objects.append(b)
+            self.objects.append(b)
 
     async def start(self, initial):
         pass
