@@ -12,6 +12,16 @@ def rand_color():
     )
 
 
+class Box(object):
+    x = 0
+    y = 0
+    w = 2
+    h = 2
+    dx = 0
+    dy = 0
+    color = 0
+
+
 class Bounce(Program):
     fps = 30
     n = 5
@@ -20,23 +30,18 @@ class Bounce(Program):
     def __init__(self):
         self.objects = []
         for i in range(self.n):
-            w = 2
-            h = 2
-            dx = randint(-2, 2)
-            dy = randint(-2, 2)
-            if dx == 0 and dy == 0:
-                dx = 1
-                dy = 1
-
-            self.objects.append({
-                w: w,
-                h: h,
-                x: randint(0, WIDTH - w),
-                y: randint(0, HEIGHT - h),
-                dx: dx,
-                dy: dy,
-                color: rand_color(),
-            })
+            b = Box()
+            b.w = 2
+            b.h = 2
+            b.x = randint(0, WIDTH - b.w)
+            b.y = randint(0, HEIGHT - b.h)
+            b.dx = randint(-2, 2)
+            b.dy = randint(-2, 2)
+            if b.dx == 0 and b.dy == 0:
+                b.dx = 1
+                b.dy = 1
+            b.color = rand_color()
+            objects.append(b)
 
     async def start(self, initial):
         pass
