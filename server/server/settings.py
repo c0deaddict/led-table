@@ -8,12 +8,13 @@ WEB_PORT = 8080
 WIDTH = 15
 HEIGHT = 15
 
-DISPLAY_IMPL = 'server.leds.neo'
+#DISPLAY_IMPL = 'server.leds.neo'
+DISPLAY_IMPL = 'server.leds.fake'
 
 CLAIM_EXPIRE = timedelta(seconds=15)
 
 # Table is powered on in this time window (from 08:00 until 18:00).
-SCHEDULE_ON_TIME = [time(8, 0, 0), time(18, 0, 0)]
+SCHEDULE_ON_TIME = [time(8, 0, 0), time(23, 0, 0)]
 
 # Powered off during the weekends and on (Dutch) holidays.
 SCHEDULE_ON_WEEKENDS = False
